@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+const int INF = 1e9;
+
+int tsp(int mask, int pos, int n, const vector<vector<int>>& dist, vector<vector<int>>& dp) {
+    if (mask == (1 << n) - 1) {
+        return dist[pos][0];
+    }
+
+    if (dp[mask][pos] != -1) {
+        return dp[mask][pos];
+    }
+
+    int ans = INF;
+
+    for (int nextCity = 0; nextCity < n; nextCity++) {
+        if ((mask & (1 << nextCity)) == 0) {
+            int newCost = dist[pos][nextCity] + tsp(mask | (1 << nextCity), nextCity, n, dist, dp);
+            ans = min(ans, newCost);
+        }
+    }
+
+    return dp[mask][pos] = ans;
+}
+
+int main() {
+    int n = 4;
+
+    vector<vector<int>> dist = {
+        {0, 10, 15, 20},
+        {10, 0, 35, 25},
+        {15, 35, 0, 30},
+        {20, 25, 30, 0}
+    };
+
+    vector<vector<int>> dp(1 << n, vector<int>(n, -1));
+
+    int minCost = tsp(1, 0, n, dist, dp);
+
+    cout << "The minimum tour cost is: " << minCost << endl;
+
+    return 0;
+}
